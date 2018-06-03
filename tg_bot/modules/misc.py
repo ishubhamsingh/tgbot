@@ -3,6 +3,7 @@ import json
 import random
 from datetime import datetime
 from typing import Optional, List
+from hurry.filesize import size
 
 import requests
 from telegram import Message, Chat, Update, Bot, MessageEntity
@@ -114,6 +115,7 @@ HIT = (
 
 GMAPS_LOC = "https://maps.googleapis.com/maps/api/geocode/json"
 GMAPS_TIME = "https://maps.googleapis.com/maps/api/timezone/json"
+AEX_OTA_API = "https://downloads.aospextended.com/ota/"
 
 
 @run_async
@@ -344,6 +346,47 @@ def stats(bot: Bot, update: Update):
     update.effective_message.reply_text("Current stats:\n" + "\n".join([mod.__stats__() for mod in STATS]))
 
 
+@run_async
+def getaex(bot: Bot, update: Update, args: List[str]):
+    device = " ".join(args)
+    res = requests.get(AEX_OTA_API + device.lower())
+
+    if res.status_code == 200:
+        apidata = json.loads(res.text)
+        if apidata.get('error'):
+            update.effective_message.reply_text("Sadly no builds available for " + device.lower())
+            return
+        else:
+            message = """ 
+*AOSP EXTENDED for {}* \
+
+`by:` [{}]({}) \
+
+[XDA thread]({}) \
+
+
+
+`Latest build:` [{}]({}) \
+                                
+`Build date: {}` \
+
+`Build size: {}` \
+
+`md5: {}`
+""".format(device.lower(), apidata.get('developer'), apidata.get('developer_url'),
+           apidata.get('forum_url'),
+           apidata.get('filename'),
+           apidata.get('url'),
+           datetime.strptime(apidata.get('build_date'), "%Y%m%d-%H%M").strftime("%d %B %Y"),
+           size(int(apidata.get('filesize'))),
+           apidata.get('md5'))
+            update.effective_message.reply_text(
+                message, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
+            return
+    else:
+        update.effective_message.reply_text("Didn't get a valid response from server")
+
+
 # /ip is for private use
 __help__ = """
  - /id: get the current group id. If used by replying to a message, gets that user's id.
@@ -351,6 +394,7 @@ __help__ = """
  - /slap: slap a user, or get slapped if not a reply.
  - /time <place>: gives the local time at the given place.
  - /info: get information about a user.
+ - /getaex <device codename>: gives details of latest official build for the entered device.
 
  - /markdownhelp: quick summary of how markdown works in telegram - can only be called in private chats.
 """
@@ -370,6 +414,7 @@ ECHO_HANDLER = CommandHandler("echo", echo, filters=Filters.user(OWNER_ID))
 MD_HELP_HANDLER = CommandHandler("markdownhelp", markdown_help, filters=Filters.private)
 
 STATS_HANDLER = CommandHandler("stats", stats, filters=CustomFilters.sudo_filter)
+GETAEX_HANDLER = CommandHandler("getaex", getaex, pass_args=True)
 
 dispatcher.add_handler(ID_HANDLER)
 dispatcher.add_handler(IP_HANDLER)
@@ -380,3 +425,4 @@ dispatcher.add_handler(INFO_HANDLER)
 dispatcher.add_handler(ECHO_HANDLER)
 dispatcher.add_handler(MD_HELP_HANDLER)
 dispatcher.add_handler(STATS_HANDLER)
+dispatcher.add_handler(GETAEX_HANDLER)
