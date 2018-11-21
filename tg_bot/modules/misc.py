@@ -115,7 +115,7 @@ HIT = (
 
 GMAPS_LOC = "https://maps.googleapis.com/maps/api/geocode/json"
 GMAPS_TIME = "https://maps.googleapis.com/maps/api/timezone/json"
-AEX_OTA_API = "https://downloads.aospextended.com/ota/"
+AEX_OTA_API = "https://api.aospextended.com/ota/"
 
 
 @run_async
@@ -348,8 +348,13 @@ def stats(bot: Bot, update: Update):
 
 @run_async
 def getaex(bot: Bot, update: Update, args: List[str]):
-    device = " ".join(args)
-    res = requests.get(AEX_OTA_API + device.lower())
+    if len(args) != 2:
+        update.effective_message.reply_text("Pass correct parameters, Check help for more info !")
+        return
+
+    device = args[0]
+    version = args[1]
+    res = requests.get(AEX_OTA_API + device.lower() + '/' + version.lower())
 
     if res.status_code == 200:
         apidata = json.loads(res.text)
@@ -394,7 +399,7 @@ __help__ = """
  - /slap: slap a user, or get slapped if not a reply.
  - /time <place>: gives the local time at the given place.
  - /info: get information about a user.
- - /getaex <device codename>: gives details of latest official build for the entered device.
+ - /getaex <device codename> <android version>: gives details of latest official build for the entered device for particular android version.
 
  - /markdownhelp: quick summary of how markdown works in telegram - can only be called in private chats.
 """
