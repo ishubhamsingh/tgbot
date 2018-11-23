@@ -389,7 +389,7 @@ def getaex(bot: Bot, update: Update, args: List[str]):
                 message, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
             return
     else:
-        update.effective_message.reply_text("Didn't get a valid response from server")
+        update.effective_message.reply_text("No builds found for the provided device-version combo.")
 
 
 # /ip is for private use
