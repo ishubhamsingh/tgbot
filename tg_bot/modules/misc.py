@@ -354,7 +354,7 @@ def getaex(bot: Bot, update: Update, args: List[str]):
 
     device = args[0]
     version = args[1]
-    res = requests.get(AEX_OTA_API + device.lower() + '/' + version.lower())
+    res = requests.get(AEX_OTA_API + device + '/' + version.lower())
 
     if res.status_code == 200:
         apidata = json.loads(res.text)
