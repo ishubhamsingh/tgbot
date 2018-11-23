@@ -381,7 +381,7 @@ def getaex(bot: Bot, update: Update, args: List[str]):
 """.format(device.lower(), apidata.get('developer'), apidata.get('developer_url'),
            apidata.get('forum_url'),
            apidata.get('filename'),
-           apidata.get('url'),
+           "https://downloads.aospextended.com/download/" + device + "/" + version + "/" + apidata.get('filename'),
            datetime.strptime(apidata.get('build_date'), "%Y%m%d-%H%M").strftime("%d %B %Y"),
            size(int(apidata.get('filesize'))),
            apidata.get('md5'))
