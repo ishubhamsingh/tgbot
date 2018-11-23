@@ -359,7 +359,7 @@ def getaex(bot: Bot, update: Update, args: List[str]):
     if res.status_code == 200:
         apidata = json.loads(res.text)
         if apidata.get('error'):
-            update.effective_message.reply_text("Sadly no builds available for " + device.lower())
+            update.effective_message.reply_text("Sadly no builds available for " + device)
             return
         else:
             message = """ 
@@ -378,7 +378,7 @@ def getaex(bot: Bot, update: Update, args: List[str]):
 `Build size: {}` \
 
 `md5: {}`
-""".format(device.lower(), apidata.get('developer'), apidata.get('developer_url'),
+""".format(device, apidata.get('developer'), apidata.get('developer_url'),
            apidata.get('forum_url'),
            apidata.get('filename'),
            "https://downloads.aospextended.com/download/" + device + "/" + version + "/" + apidata.get('filename'),
